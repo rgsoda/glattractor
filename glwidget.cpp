@@ -1,0 +1,196 @@
+#include <QtGui>
+#include <QtOpenGL>
+
+#include <math.h>
+
+#include "glwidget.h"
+
+
+#ifndef GL_MULTISAMPLE
+#define GL_MULTISAMPLE  0x809D
+#endif
+
+GLWidget::GLWidget(QWidget *parent)
+    : QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
+{
+
+    xRot = 0;
+    yRot = 0;
+    zRot = 0;
+    zoom = 40;
+    qtGreen = QColor::fromCmykF(0.40, 0.0, 1.0, 0.0);
+    qtPurple = QColor::fromCmykF(0.39, 0.39, 0.0, 0.0);
+    qtBlack = QColor::fromCmykF(0.0, 0.0, 0.0, 1.0);
+    qtWhite = QColor::fromRgb(0,0,0);
+
+}
+GLWidget::~GLWidget()
+{
+}
+
+QSize GLWidget::minimumSizeHint() const
+{
+    return QSize(50, 50);
+}
+
+QSize GLWidget::sizeHint() const
+
+{
+    return QSize(800, 800);
+}
+
+
+static void qNormalizeAngle(int &angle)
+{
+    while (angle < 0)
+        angle += 360 * 16;
+    while (angle > 360 * 16)
+        angle -= 360 * 16;
+}
+
+void GLWidget::setXRotation(int angle)
+{
+    qNormalizeAngle(angle);
+    if (angle != xRot) {
+        xRot = angle;
+        emit xRotationChanged(angle);
+        updateGL();
+    }
+}
+
+void GLWidget::setYRotation(int angle)
+{
+    qNormalizeAngle(angle);
+    if (angle != yRot) {
+        yRot = angle;
+        emit yRotationChanged(angle);
+        updateGL();
+    }
+}
+
+void GLWidget::setZRotation(int angle)
+{
+    qNormalizeAngle(angle);
+    if (angle != zRot) {
+        zRot = angle;
+        emit zRotationChanged(angle);
+        updateGL();
+    }
+}
+
+void GLWidget::setZoom(int _zoom) {
+    zoom = _zoom;
+    emit zoomChanged(zoom);
+    updateGL();
+}
+
+void GLWidget::initializeGL()
+{
+    qglClearColor(qtBlack);
+
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+    glEnable(GL_POINT_SMOOTH);
+    //glShadeModel(GL_FLAT);
+    glShadeModel(GL_SMOOTH);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+
+    glEnable(GL_MULTISAMPLE);
+}
+
+void GLWidget::paintGL()
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glRotated(xRot / 16.0, 1.0, 0.0, 0.0);
+    glRotated(yRot / 16.0, 0.0, 1.0, 0.0);
+    glRotated(zRot / 16.0, 0.0, 0.0, 1.0);
+
+    int width=800, height=800;
+
+    GLdouble aspectratio = GLdouble(width) / GLdouble(height);
+
+    // Set the camera parameters
+    gluPerspective(90.,         // Vertical FOV degrees.
+                   aspectratio, // The aspect ratio.
+                   10.,         // Near clipping 40/130
+                   200.);       // Far clipping
+
+    // Set the camera location
+    glMatrixMode(GL_MODELVIEW);
+
+    glLoadIdentity();
+
+    gluLookAt(zoom, 0., zoom,    // eye x,y,z
+              0., 0., 0.,       // center x,y,z
+              0., 2., 0.);      // Up direction
+
+    glPointSize(2.2f);
+    glBegin(GL_POINTS);
+
+
+    float x,y,z, x2, y2 = 0;
+    float a = -2.6605426906608045f;
+    float b = -0.3278694022446871f;
+    float c = 2.8367380360141397f;
+    float d = 2.35758491512388f;
+
+\
+    for(int iter=0;iter<65000;iter++){
+              x2 = sin(a * y) - z * cos(b * x);
+              y2 = z * sin(c * x) - cos(d * y);
+              z = sin(x);
+              x = x2;
+              y = y2;
+              //glColor4f(0.3,1.0,z,0.9);
+              glColor4f(x,z,y,0.8f);
+              glVertex3f(x*10, y*10, z*10);
+              //qDebug(" %f %f %f" ,x,y,z);
+    }
+
+    glEnd();
+
+    glFlush();
+
+
+}
+
+void GLWidget::resizeGL(int width, int height)
+{
+    int side = qMin(width, height);
+    glViewport((width - side) / 2, (height - side) / 2, side, side);
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+#ifdef QT_OPENGL_ES_1
+    glOrthof(-0.5, +0.5, -0.5, +0.5, 4.0, 15.0);
+#else
+    glOrtho(-0.5, +0.5, -0.5, +0.5, 4.0, 15.0);
+#endif
+    glMatrixMode(GL_MODELVIEW);
+}
+
+void GLWidget::mousePressEvent(QMouseEvent *event)
+{
+    lastPos = event->pos();
+}
+
+void GLWidget::mouseMoveEvent(QMouseEvent *event)
+{
+    int dx = event->x() - lastPos.x();
+    int dy = event->y() - lastPos.y();
+
+    if (event->buttons() & Qt::LeftButton) {
+        setXRotation(xRot + 8 * dy);
+        setYRotation(yRot + 8 * dx);
+    } else if (event->buttons() & Qt::RightButton) {
+        setXRotation(xRot + 8 * dy);
+        setZRotation(zRot + 8 * dx);
+
+    }
+    lastPos = event->pos();
+}
