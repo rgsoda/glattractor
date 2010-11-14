@@ -106,33 +106,18 @@ void GLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glRotated(xRot / 16.0, 1.0, 0.0, 0.0);
-    glRotated(yRot / 16.0, 0.0, 1.0, 0.0);
-    glRotated(zRot / 16.0, 0.0, 0.0, 1.0);
-
-    int width=800, height=800;
-
-    GLdouble aspectratio = GLdouble(width) / GLdouble(height);
-
-    // Set the camera parameters
-    gluPerspective(90.,         // Vertical FOV degrees.
-                   aspectratio, // The aspect ratio.
-                   10.,         // Near clipping 40/130
-                   200.);       // Far clipping
-
     // Set the camera location
     glMatrixMode(GL_MODELVIEW);
 
     glLoadIdentity();
 
-    gluLookAt(zoom, 0., zoom,    // eye x,y,z
-              0., 0., 0.,       // center x,y,z
-              0., 2., 0.);      // Up direction
+    glTranslated(0.0, 0.0, -40.0);
 
-    glPointSize(2.2f);
+    glRotated(xRot / 16.0, 1.0, 0.0, 0.0);
+    glRotated(yRot / 16.0, 0.0, 1.0, 0.0);
+    glRotated(zRot / 16.0, 0.0, 0.0, 1.0);
+
+    glPointSize(1.0f);
 
     if (pointBuffer)
     {
@@ -146,16 +131,19 @@ void GLWidget::paintGL()
 
 void GLWidget::resizeGL(int width, int height)
 {
-    int side = qMin(width, height);
-    glViewport((width - side) / 2, (height - side) / 2, side, side);
+    glViewport(0, 0, width, height);
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-#ifdef QT_OPENGL_ES_1
-    glOrthof(-0.5, +0.5, -0.5, +0.5, 4.0, 15.0);
-#else
-    glOrtho(-0.5, +0.5, -0.5, +0.5, 4.0, 15.0);
-#endif
+
+    GLdouble aspectratio = GLdouble(width) / GLdouble(height);
+
+    // Set the camera parameters
+    gluPerspective(90.,         // Vertical FOV degrees.
+                   aspectratio, // The aspect ratio.
+                   0.1,         // Near clipping 40/130
+                   200.);       // Far clipping
+
     glMatrixMode(GL_MODELVIEW);
 }
 
