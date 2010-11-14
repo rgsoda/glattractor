@@ -16,6 +16,12 @@ protected:
     bool deleteBuffers(GLsizei n, const GLuint *buffers);
 
     private:
+    typedef void (*GenBuffersPtr)(GLsizei n, GLuint *buffers);
+    typedef void (*BindBuffersPtr)(GLenum target, GLuint buffer);
+    typedef void (*BufferDataPtr)(GLenum target, GLsizeiptrARB size,
+                                  const GLvoid *data, GLenum usage);
+    typedef void (*DeleteBuffersPtr)(GLsizei n, const GLuint *buffers);
+
     static void initBufferExtension(const QGLContext *context);
     template <typename ExtensionProto>
     static bool resolveExtension(const QGLContext *context,
@@ -23,10 +29,10 @@ protected:
                                  ExtensionProto *extensionPtr);
 
     static bool s_vboInitialized;
-    static PFNGLGENBUFFERSARBPROC     s_glGenBuffers;
-    static PFNGLBINDBUFFERARBPROC     s_glBindBuffer;
-    static PFNGLBUFFERDATAARBPROC     s_glBufferData;
-    static PFNGLDELETEBUFFERSARBPROC  s_glDeleteBuffers;
+    static GenBuffersPtr    s_glGenBuffers;
+    static BindBuffersPtr   s_glBindBuffer;
+    static BufferDataPtr    s_glBufferData;
+    static DeleteBuffersPtr s_glDeleteBuffers;
 };
 
 struct Point

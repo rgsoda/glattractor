@@ -114,7 +114,7 @@ void PointBuffer::render()
     {
         // upload point data
         bufferData(GL_ARRAY_BUFFER, size() * sizeof(Point),
-        m_pointList.data(), GL_STATIC_DRAW);
+            m_pointList.data(), GL_STATIC_DRAW);
         m_dirty = false;
     }
     glVertexPointer(3, GL_FLOAT, sizeof(Point), vertexOffset(0));
