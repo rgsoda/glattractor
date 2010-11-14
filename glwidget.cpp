@@ -90,9 +90,12 @@ void GLWidget::initializeGL()
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
+
     glEnable(GL_POINT_SMOOTH);
+
     //glShadeModel(GL_FLAT);
     glShadeModel(GL_SMOOTH);
+
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 
@@ -111,7 +114,7 @@ void GLWidget::paintGL()
 
     glLoadIdentity();
 
-    glTranslated(0.0, 0.0, -40.0);
+    glTranslated(0.0, 0.0, -zoom);
 
     glRotated(xRot / 16.0, 1.0, 0.0, 0.0);
     glRotated(yRot / 16.0, 0.0, 1.0, 0.0);
