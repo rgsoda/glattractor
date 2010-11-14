@@ -88,7 +88,7 @@ void GLWidget::initializeGL()
 {
     qglClearColor(qtBlack);
 
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     glEnable(GL_BLEND);
 
     glEnable(GL_POINT_SMOOTH);
@@ -190,7 +190,7 @@ void GLWidget::fillPointBuffer()
         x = x2;
         y = y2;
         Point p(x * 10, y * 10, z * 10,
-                x, y, z, 0.8f);
+                x, y, z, 0.4f);
         pointBuffer->addPoint(p);
     }
 }
