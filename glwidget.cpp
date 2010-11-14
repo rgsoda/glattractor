@@ -4,6 +4,7 @@
 #include <math.h>
 
 #include "glwidget.h"
+#include "pointbuffer.h"
 
 
 #ifndef GL_MULTISAMPLE
@@ -22,7 +23,6 @@ GLWidget::GLWidget(QWidget *parent)
     qtPurple = QColor::fromCmykF(0.39, 0.39, 0.0, 0.0);
     qtBlack = QColor::fromCmykF(0.0, 0.0, 0.0, 1.0);
     qtWhite = QColor::fromRgb(0,0,0);
-
 }
 GLWidget::~GLWidget()
 {
@@ -97,6 +97,9 @@ void GLWidget::initializeGL()
     glEnable(GL_CULL_FACE);
 
     glEnable(GL_MULTISAMPLE);
+
+    pointBuffer = QSharedPointer<PointBuffer>(
+                new PointBuffer(context()));
 }
 
 void GLWidget::paintGL()
@@ -130,33 +133,15 @@ void GLWidget::paintGL()
               0., 2., 0.);      // Up direction
 
     glPointSize(2.2f);
-    glBegin(GL_POINTS);
 
-
-    float x,y,z, x2, y2 = 0;
-    float a = -2.6605426906608045f;
-    float b = -0.3278694022446871f;
-    float c = 2.8367380360141397f;
-    float d = 2.35758491512388f;
-
-\
-    for(int iter=0;iter<65000;iter++){
-              x2 = sin(a * y) - z * cos(b * x);
-              y2 = z * sin(c * x) - cos(d * y);
-              z = sin(x);
-              x = x2;
-              y = y2;
-              //glColor4f(0.3,1.0,z,0.9);
-              glColor4f(x,z,y,0.8f);
-              glVertex3f(x*10, y*10, z*10);
-              //qDebug(" %f %f %f" ,x,y,z);
+    if (pointBuffer)
+    {
+        if (pointBuffer->size() == 0)
+            fillPointBuffer();
+        pointBuffer->render();
     }
 
-    glEnd();
-
     glFlush();
-
-
 }
 
 void GLWidget::resizeGL(int width, int height)
@@ -193,4 +178,28 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 
     }
     lastPos = event->pos();
+}
+
+void GLWidget::fillPointBuffer()
+{
+    float x,y,z, x2, y2 = 0;
+    float a = -2.6605426906608045f;
+    float b = -0.3278694022446871f;
+    float c = 2.8367380360141397f;
+    float d = 2.35758491512388f;
+
+    if (!pointBuffer)
+        return;
+
+    for(int iter=0;iter<1000000;iter++)
+    {
+        x2 = sin(a * y) - z * cos(b * x);
+        y2 = z * sin(c * x) - cos(d * y);
+        z = sin(x);
+        x = x2;
+        y = y2;
+        Point p(x * 10, y * 10, z * 10,
+                x, y, z, 0.8f);
+        pointBuffer->addPoint(p);
+    }
 }

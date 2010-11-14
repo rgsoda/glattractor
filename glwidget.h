@@ -2,7 +2,9 @@
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
 
+#include <QSharedPointer>
 #include <QGLWidget>
+#include "pointbuffer.h"
 
 
 class GLWidget : public QGLWidget
@@ -32,7 +34,9 @@ protected:
     void resizeGL(int width, int height);
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
+
 private:
+    void fillPointBuffer();
 
     int xRot;
     int yRot;
@@ -43,6 +47,7 @@ private:
     QColor qtPurple;
     QColor qtWhite;
     QColor qtBlack;
+    QSharedPointer<PointBuffer> pointBuffer;
 };
 
 #endif
