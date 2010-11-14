@@ -22,6 +22,10 @@ public slots:
     void setYRotation(int angle);
     void setZRotation(int angle);
     void setZoom(int zoom);
+    void setA(int value);
+    void setB(int value);
+    void setC(int value);
+    void setD(int value);
 
 signals:
     void xRotationChanged(int angle);
@@ -42,6 +46,10 @@ private:
     int yRot;
     int zRot;
     float zoom;
+    float A;
+    float B;
+    float C;
+    float D;
     QPoint lastPos;
     QColor qtGreen;
     QColor qtPurple;

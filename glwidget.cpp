@@ -23,6 +23,13 @@ GLWidget::GLWidget(QWidget *parent)
     qtPurple = QColor::fromCmykF(0.39, 0.39, 0.0, 0.0);
     qtBlack = QColor::fromCmykF(0.0, 0.0, 0.0, 1.0);
     qtWhite = QColor::fromRgb(0,0,0);
+
+    A = -2.6605426906608045f;
+    B = -0.3278694022446871f;
+    C = 2.8367380360141397f;
+    D = 2.35758491512388f;
+
+
 }
 GLWidget::~GLWidget()
 {
@@ -183,18 +190,17 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 void GLWidget::fillPointBuffer()
 {
     float x,y,z, x2, y2 = 0;
-    float a = -2.6605426906608045f;
-    float b = -0.3278694022446871f;
-    float c = 2.8367380360141397f;
-    float d = 2.35758491512388f;
 
     if (!pointBuffer)
         return;
-
-    for(int iter=0;iter<1000000;iter++)
+    qDebug("A - %f", A);
+    qDebug("B - %f", B);
+    qDebug("C - %f", C);
+    qDebug("D - %f", D);
+    for(int iter=0;iter<100000;iter++)
     {
-        x2 = sin(a * y) - z * cos(b * x);
-        y2 = z * sin(c * x) - cos(d * y);
+        x2 = sin(A * y) - z * cos(B * x);
+        y2 = z * sin(C * x) - cos(D * y);
         z = sin(x);
         x = x2;
         y = y2;
@@ -202,4 +208,28 @@ void GLWidget::fillPointBuffer()
                 x, y, z, 0.8f);
         pointBuffer->addPoint(p);
     }
+}
+
+void GLWidget::setA(int value) {
+    if(value != 0) {
+        A = A + 1.0/value;
+        B = B - 1.0/value;
+        C = C + 1.0/value;
+        D = D - 1.0/value;
+
+    }
+
+    pointBuffer->clear();
+    fillPointBuffer();
+    pointBuffer->render();
+
+}
+void GLWidget::setB(int value) {
+    A = value;
+}
+void GLWidget::setC(int value) {
+    A = value;
+}
+void GLWidget::setD(int value) {
+    A = value;
 }

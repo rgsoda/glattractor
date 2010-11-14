@@ -27,6 +27,12 @@ private:
     QSlider *ySlider;
     QSlider *zSlider;
     QSlider *zoomSlider;
+
+    QSlider *aSlider;
+    QSlider *bSlider;
+    QSlider *cSlider;
+    QSlider *dSlider;
+
 };
 
 #endif
