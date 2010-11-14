@@ -13,6 +13,11 @@
 
 const float GLWidget::MAX_ZOOM;
 
+const float GLWidget::INITIAL_A;
+const float GLWidget::INITIAL_B;
+const float GLWidget::INITIAL_C;
+const float GLWidget::INITIAL_D;
+
 GLWidget::GLWidget(QWidget *parent)
     : QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
 {
@@ -24,6 +29,13 @@ GLWidget::GLWidget(QWidget *parent)
     qtPurple = QColor::fromCmykF(0.39, 0.39, 0.0, 0.0);
     qtBlack = QColor::fromCmykF(0.0, 0.0, 0.0, 1.0);
     qtWhite = QColor::fromRgb(0,0,0);
+
+    A = INITIAL_A;
+    B = INITIAL_B;
+    C = INITIAL_C;
+    D = INITIAL_D;
+
+
 }
 GLWidget::~GLWidget()
 {
@@ -124,6 +136,11 @@ void GLWidget::paintGL()
     glRotated(yRot / 16.0, 0.0, 1.0, 0.0);
     glRotated(zRot / 16.0, 0.0, 0.0, 1.0);
 
+
+    gluLookAt(zoom, 0., zoom,    // eye x,y,z
+              0., 0., 0.,       // center x,y,z
+              0., 2., 0.);      // Up direction
+
     glPointSize(1.0f);
 
     if (pointBuffer)
@@ -182,18 +199,13 @@ void GLWidget::wheelEvent(QWheelEvent *event)
 void GLWidget::fillPointBuffer()
 {
     float x,y,z, x2, y2 = 0;
-    float a = -2.6605426906608045f;
-    float b = -0.3278694022446871f;
-    float c = 2.8367380360141397f;
-    float d = 2.35758491512388f;
 
     if (!pointBuffer)
         return;
-
-    for(int iter=0;iter<1000000;iter++)
+    for(int iter=0;iter<100000;iter++)
     {
-        x2 = sin(a * y) - z * cos(b * x);
-        y2 = z * sin(c * x) - cos(d * y);
+        x2 = sin(A * y) - z * cos(B * x);
+        y2 = z * sin(C * x) - cos(D * y);
         z = sin(x);
         x = x2;
         y = y2;
@@ -201,4 +213,34 @@ void GLWidget::fillPointBuffer()
                 x, y, z, 0.4f);
         pointBuffer->addPoint(p);
     }
+}
+
+void GLWidget::setA(double value) {
+    A = value;
+    redrawPoints();
+}
+void GLWidget::setB(double value) {
+    B = value;
+    redrawPoints();
+}
+void GLWidget::setC(double value) {
+    C = value;
+    redrawPoints();
+}
+void GLWidget::setD(double value) {
+    D = value;
+    redrawPoints();
+}
+
+void GLWidget::redrawPoints() {
+    if (pointBuffer)
+    {
+        pointBuffer->clear();
+        if (pointBuffer->size() == 0) {
+            fillPointBuffer();
+
+        }
+        pointBuffer->render();
+    }
+    updateGL();
 }

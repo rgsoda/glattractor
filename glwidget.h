@@ -13,6 +13,10 @@ class GLWidget : public QGLWidget
 
 public:
     const static float MAX_ZOOM = 200.0f;
+    const static float INITIAL_A = -2.6605426906608045f;
+    const static float INITIAL_B = -0.3278694022446871f;
+    const static float INITIAL_C = 2.8367380360141397f;
+    const static float INITIAL_D = -2.35758491512388f;
 
     GLWidget(QWidget *parent = 0);
     ~GLWidget();
@@ -24,6 +28,10 @@ public slots:
     void setYRotation(int angle);
     void setZRotation(int angle);
     void setZoom(int zoom);
+    void setA(double value);
+    void setB(double value);
+    void setC(double value);
+    void setD(double value);
 
 signals:
     void xRotationChanged(int angle);
@@ -40,11 +48,15 @@ protected:
 
 private:
     void fillPointBuffer();
-
+    void redrawPoints();
     int xRot;
     int yRot;
     int zRot;
     float zoom;
+    float A;
+    float B;
+    float C;
+    float D;
     QPoint lastPos;
     QColor qtGreen;
     QColor qtPurple;
