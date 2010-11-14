@@ -12,6 +12,8 @@ class GLWidget : public QGLWidget
     Q_OBJECT
 
 public:
+    const static float MAX_ZOOM = 200.0f;
+
     GLWidget(QWidget *parent = 0);
     ~GLWidget();
 
@@ -34,6 +36,7 @@ protected:
     void resizeGL(int width, int height);
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
+    void wheelEvent(QWheelEvent *event);
 
 private:
     void fillPointBuffer();
