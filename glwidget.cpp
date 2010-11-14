@@ -124,6 +124,11 @@ void GLWidget::paintGL()
     glRotated(yRot / 16.0, 0.0, 1.0, 0.0);
     glRotated(zRot / 16.0, 0.0, 0.0, 1.0);
 
+
+    gluLookAt(zoom, 0., zoom,    // eye x,y,z
+              0., 0., 0.,       // center x,y,z
+              0., 2., 0.);      // Up direction
+
     glPointSize(1.0f);
 
     if (pointBuffer)
@@ -185,7 +190,7 @@ void GLWidget::fillPointBuffer()
     qDebug("B - %f", B);
     qDebug("C - %f", C);
     qDebug("D - %f", D);
-    for(int iter=0;iter<100000;iter++)
+    for(int iter=0;iter<10;iter++)
     {
         x2 = sin(A * y) - z * cos(B * x);
         y2 = z * sin(C * x) - cos(D * y);
@@ -207,10 +212,7 @@ void GLWidget::setA(int value) {
 
     }
 
-    pointBuffer->clear();
-    fillPointBuffer();
-    pointBuffer->render();
-
+    paintGL();
 }
 void GLWidget::setB(int value) {
     A = value;
