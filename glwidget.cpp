@@ -11,10 +11,11 @@
 #define GL_MULTISAMPLE  0x809D
 #endif
 
+const float GLWidget::MAX_ZOOM;
+
 GLWidget::GLWidget(QWidget *parent)
     : QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
 {
-
     xRot = 0;
     yRot = 0;
     zRot = 0;
@@ -87,6 +88,9 @@ void GLWidget::setZRotation(int angle)
 
 void GLWidget::setZoom(int _zoom) {
     zoom = _zoom;
+    zoom = qMax(zoom, 0.0f);
+    zoom = qMin(zoom, MAX_ZOOM);
+
     emit zoomChanged(zoom);
     updateGL();
 }
@@ -95,11 +99,14 @@ void GLWidget::initializeGL()
 {
     qglClearColor(qtBlack);
 
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     glEnable(GL_BLEND);
+
     glEnable(GL_POINT_SMOOTH);
+
     //glShadeModel(GL_FLAT);
     glShadeModel(GL_SMOOTH);
+
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 
@@ -118,7 +125,7 @@ void GLWidget::paintGL()
 
     glLoadIdentity();
 
-    glTranslated(0.0, 0.0, -40.0);
+    glTranslated(0.0, 0.0, -zoom);
 
     glRotated(xRot / 16.0, 1.0, 0.0, 0.0);
     glRotated(yRot / 16.0, 0.0, 1.0, 0.0);
@@ -154,7 +161,7 @@ void GLWidget::resizeGL(int width, int height)
     gluPerspective(90.,         // Vertical FOV degrees.
                    aspectratio, // The aspect ratio.
                    0.1,         // Near clipping 40/130
-                   200.);       // Far clipping
+                   MAX_ZOOM + 200.0f);      // Far clipping
 
     glMatrixMode(GL_MODELVIEW);
 }
@@ -175,9 +182,13 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     } else if (event->buttons() & Qt::RightButton) {
         setXRotation(xRot + 8 * dy);
         setZRotation(zRot + 8 * dx);
-
     }
     lastPos = event->pos();
+}
+
+void GLWidget::wheelEvent(QWheelEvent *event)
+{
+    setZoom(zoom + event->delta() / 40.0f);
 }
 
 void GLWidget::fillPointBuffer()
@@ -198,7 +209,7 @@ void GLWidget::fillPointBuffer()
         x = x2;
         y = y2;
         Point p(x * 10, y * 10, z * 10,
-                x, y, z, 0.8f);
+                x, y, z, 0.4f);
         pointBuffer->addPoint(p);
     }
 }

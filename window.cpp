@@ -52,7 +52,7 @@ Window::Window()
     ySlider->setValue(345 * 16);
     zSlider->setValue(0 * 16);
     zoomSlider->setTickInterval(1);
-    zoomSlider->setRange(-100,100);
+    zoomSlider->setRange(0, GLWidget::MAX_ZOOM);
     zoomSlider->setValue(40);
     setWindowTitle(tr("Attractor"));
 }
