@@ -13,6 +13,11 @@
 
 const float GLWidget::MAX_ZOOM;
 
+const float GLWidget::INITIAL_A;
+const float GLWidget::INITIAL_B;
+const float GLWidget::INITIAL_C;
+const float GLWidget::INITIAL_D;
+
 GLWidget::GLWidget(QWidget *parent)
     : QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
 {
@@ -25,10 +30,10 @@ GLWidget::GLWidget(QWidget *parent)
     qtBlack = QColor::fromCmykF(0.0, 0.0, 0.0, 1.0);
     qtWhite = QColor::fromRgb(0,0,0);
 
-    A = -2.6605426906608045f;
-    B = -0.3278694022446871f;
-    C = 2.8367380360141397f;
-    D = 2.35758491512388f;
+    A = INITIAL_A;
+    B = INITIAL_B;
+    C = INITIAL_C;
+    D = INITIAL_D;
 
 
 }
@@ -197,11 +202,7 @@ void GLWidget::fillPointBuffer()
 
     if (!pointBuffer)
         return;
-    qDebug("A - %f", A);
-    qDebug("B - %f", B);
-    qDebug("C - %f", C);
-    qDebug("D - %f", D);
-    for(int iter=0;iter<10;iter++)
+    for(int iter=0;iter<100000;iter++)
     {
         x2 = sin(A * y) - z * cos(B * x);
         y2 = z * sin(C * x) - cos(D * y);
@@ -214,23 +215,32 @@ void GLWidget::fillPointBuffer()
     }
 }
 
-void GLWidget::setA(int value) {
-    if(value != 0) {
-        A = A + 1.0/value;
-        B = B - 1.0/value;
-        C = C + 1.0/value;
-        D = D - 1.0/value;
+void GLWidget::setA(double value) {
+    A = value;
+    redrawPoints();
+}
+void GLWidget::setB(double value) {
+    B = value;
+    redrawPoints();
+}
+void GLWidget::setC(double value) {
+    C = value;
+    redrawPoints();
+}
+void GLWidget::setD(double value) {
+    D = value;
+    redrawPoints();
+}
 
+void GLWidget::redrawPoints() {
+    if (pointBuffer)
+    {
+        pointBuffer->clear();
+        if (pointBuffer->size() == 0) {
+            fillPointBuffer();
+
+        }
+        pointBuffer->render();
     }
-
-    paintGL();
-}
-void GLWidget::setB(int value) {
-    A = value;
-}
-void GLWidget::setC(int value) {
-    A = value;
-}
-void GLWidget::setD(int value) {
-    A = value;
+    updateGL();
 }

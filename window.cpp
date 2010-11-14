@@ -13,16 +13,14 @@ Window::Window()
     zSlider = createSlider();
     zoomSlider = createSlider();
 
-    aSlider = createSlider();
-    bSlider = createSlider();
-    cSlider = createSlider();
-    dSlider = createSlider();
-
-    aSlider->setRange(-10000,10000);
-    bSlider->setRange(-2,2);
-    cSlider->setRange(-2,2);
-    dSlider->setRange(-2,2);
-
+    aSpin = createSpinBox();
+    aSpin->setValue(GLWidget::INITIAL_A);
+    bSpin = createSpinBox();
+    bSpin->setValue(GLWidget::INITIAL_B);
+    cSpin = createSpinBox();
+    cSpin->setValue(GLWidget::INITIAL_C);
+    dSpin = createSpinBox();
+    dSpin->setValue(GLWidget::INITIAL_D);
 
     connect(xSlider, SIGNAL(valueChanged(int)), glWidget, SLOT(setXRotation(int)));
     connect(glWidget, SIGNAL(xRotationChanged(int)), xSlider, SLOT(setValue(int)));
@@ -35,17 +33,30 @@ Window::Window()
     connect(zoomSlider, SIGNAL(valueChanged(int)), glWidget, SLOT(setZoom(int)));
     connect(glWidget, SIGNAL(zoomChanged(int)), zoomSlider, SLOT(setValue(int)));
 
-    connect(aSlider, SIGNAL(valueChanged(int)), glWidget, SLOT(setA(int)));
-    //connect(glWidget, SIGNAL(aChanged(int)), aSlider, SLOT(setValue(int)));
+    connect(aSpin, SIGNAL(valueChanged(double)),glWidget,SLOT(setA(double)));
+    connect(bSpin, SIGNAL(valueChanged(double)),glWidget,SLOT(setB(double)));
+    connect(cSpin, SIGNAL(valueChanged(double)),glWidget,SLOT(setC(double)));
+    connect(dSpin, SIGNAL(valueChanged(double)),glWidget,SLOT(setD(double)));
 
+    QHBoxLayout *displayLayout = new QHBoxLayout;
+    QVBoxLayout *mainLayout = new QVBoxLayout;
+    QHBoxLayout *spinBoxGroup = new QHBoxLayout;
 
-    QHBoxLayout *mainLayout = new QHBoxLayout;
-    mainLayout->addWidget(glWidget);
-//    mainLayout->addWidget(xSlider);
-//    mainLayout->addWidget(ySlider);
-    mainLayout->addWidget(zSlider);
-    mainLayout->addWidget(zoomSlider);
-    mainLayout->addWidget(aSlider);
+    displayLayout->addWidget(glWidget);
+//    displayLayout->addWidget(xSlider);
+//    displayLayout->addWidget(ySlider);
+    displayLayout->addWidget(zSlider);
+    displayLayout->addWidget(zoomSlider);
+
+    spinBoxGroup->addWidget(aSpin);
+    spinBoxGroup->addWidget(bSpin);
+    spinBoxGroup->addWidget(cSpin);
+    spinBoxGroup->addWidget(dSpin);
+
+    mainLayout->addLayout(spinBoxGroup);
+
+    mainLayout->addLayout(displayLayout);
+
     setLayout(mainLayout);
 
     xSlider->setValue(15 * 16);
@@ -54,7 +65,7 @@ Window::Window()
     zoomSlider->setTickInterval(1);
     zoomSlider->setRange(0, GLWidget::MAX_ZOOM);
     zoomSlider->setValue(40);
-    setWindowTitle(tr("Attractor"));
+    setWindowTitle(tr("PickOver Attractor"));
 }
 
 
@@ -69,6 +80,13 @@ QSlider *Window::createSlider()
     return slider;
 }
 
+QDoubleSpinBox *Window::createSpinBox() {
+    QDoubleSpinBox *spinbox = new QDoubleSpinBox(this);
+    spinbox->setDecimals(10);
+    spinbox->setSingleStep(0.1);
+    spinbox->setRange(-4,4);
+    return spinbox;
+}
 void Window::keyPressEvent(QKeyEvent *e)
 {
     if (e->key() == Qt::Key_Escape)

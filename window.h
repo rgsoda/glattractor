@@ -3,6 +3,7 @@
 #define WINDOW_H
 
 #include <QWidget>
+#include <QDoubleSpinBox>
 
 QT_BEGIN_NAMESPACE
 class QSlider;
@@ -21,6 +22,7 @@ protected:
 
 private:
     QSlider *createSlider();
+    QDoubleSpinBox *createSpinBox();
 
     GLWidget *glWidget;
     QSlider *xSlider;
@@ -28,10 +30,10 @@ private:
     QSlider *zSlider;
     QSlider *zoomSlider;
 
-    QSlider *aSlider;
-    QSlider *bSlider;
-    QSlider *cSlider;
-    QSlider *dSlider;
+    QDoubleSpinBox *aSpin;
+    QDoubleSpinBox *bSpin;
+    QDoubleSpinBox *cSpin;
+    QDoubleSpinBox *dSpin;
 
 };
 
