@@ -198,20 +198,24 @@ void GLWidget::wheelEvent(QWheelEvent *event)
 
 void GLWidget::fillPointBuffer()
 {
-    float x,y,z, x2, y2 = 0;
+    Point newPoint, prevPoint;
+    QColor slowColor = QColor::fromRgbF(0.0, 0.0, 1.0, 0.4);
+    QColor fastColor = QColor::fromRgbF(1.0, 0.0, 0.0, 0.4);
 
     if (!pointBuffer)
         return;
     for(int iter=0;iter<100000;iter++)
     {
-        x2 = sin(A * y) - z * cos(B * x);
-        y2 = z * sin(C * x) - cos(D * y);
-        z = sin(x);
-        x = x2;
-        y = y2;
-        Point p(x * 10, y * 10, z * 10,
-                x, y, z, 0.4f);
-        pointBuffer->addPoint(p);
+        newPoint.z = sin(prevPoint.x);
+        newPoint.x = sin(A * prevPoint.y) - prevPoint.z * cos(B * prevPoint.x);
+        newPoint.y = prevPoint.z * sin(C * prevPoint.x) - cos(D * prevPoint.y);
+
+        positionColor(newPoint);
+        //speedColor(newPoint, prevPoint, slowColor, fastColor);
+        //angleColor(newPoint, prevPoint, slowColor, fastColor);
+        pointBuffer->addPoint(newPoint);
+
+        prevPoint = newPoint;
     }
 }
 
@@ -243,4 +247,48 @@ void GLWidget::redrawPoints() {
         pointBuffer->render();
     }
     updateGL();
+}
+
+void GLWidget::positionColor(Point &newPoint) const
+{
+    newPoint.r = newPoint.x;
+    newPoint.g = newPoint.y;
+    newPoint.b = newPoint.z;
+    newPoint.a = 0.4;
+}
+
+void GLWidget::speedColor(Point &newPoint, const Point &prevPoint,
+                          const QColor &slowColor, const QColor &fastColor) const
+{
+    const float maxSpeed = 10.0f;
+
+    float sub[3] = {
+        newPoint.x - prevPoint.x,
+        newPoint.y - prevPoint.y,
+        newPoint.z - prevPoint.z
+    };
+
+    float squaredDistance = sub[0] * sub[0] + sub[1] * sub[1] + sub[2] * sub[2];
+    float factor = qMin(squaredDistance, maxSpeed) / maxSpeed;
+
+    newPoint.r = slowColor.redF() * (1 - factor) + fastColor.redF() * factor;
+    newPoint.g = slowColor.greenF() * (1 - factor) + fastColor.greenF() * factor;
+    newPoint.b = slowColor.blueF() * (1 - factor) + fastColor.blueF() * factor;
+    newPoint.a = slowColor.alphaF() * (1 - factor) + fastColor.alphaF() * factor;
+}
+
+void GLWidget::angleColor(Point &newPoint, const Point &prevPoint,
+                          const QColor &smallAngleColor,
+                          const QColor &largeAngleColor) const
+{
+    float dotProduct =
+            newPoint.x * prevPoint.x +
+            newPoint.y * prevPoint.y +
+            newPoint.z * prevPoint.z;
+    float factor =  (dotProduct - 1.0f) / 2.0f;
+
+    newPoint.r = smallAngleColor.redF() * (1 - factor) + largeAngleColor.redF() * factor;
+    newPoint.g = smallAngleColor.greenF() * (1 - factor) + largeAngleColor.greenF() * factor;
+    newPoint.b = smallAngleColor.blueF() * (1 - factor) + largeAngleColor.blueF() * factor;
+    newPoint.a = smallAngleColor.alphaF() * (1 - factor) + largeAngleColor.alphaF() * factor;
 }

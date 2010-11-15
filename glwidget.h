@@ -49,6 +49,13 @@ protected:
 private:
     void fillPointBuffer();
     void redrawPoints();
+    void positionColor(Point &newPoint) const;
+    void speedColor(Point &newPoint, const Point &prevPoint,
+                    const QColor &slowColor, const QColor &fastColor) const;
+    void angleColor(Point &newPoint, const Point &prevPoint,
+                    const QColor &smallAngleColor,
+                    const QColor &largeAngleColor) const;
+
     int xRot;
     int yRot;
     int zRot;
