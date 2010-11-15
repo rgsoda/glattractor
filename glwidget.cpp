@@ -25,18 +25,13 @@ GLWidget::GLWidget(QWidget *parent)
     yRot = 0;
     zRot = 0;
     zoom = 40;
-    qtGreen = QColor::fromCmykF(0.40, 0.0, 1.0, 0.0);
-    qtPurple = QColor::fromCmykF(0.39, 0.39, 0.0, 0.0);
-    qtBlack = QColor::fromCmykF(0.0, 0.0, 0.0, 1.0);
-    qtWhite = QColor::fromRgb(0,0,0);
 
     A = INITIAL_A;
     B = INITIAL_B;
     C = INITIAL_C;
     D = INITIAL_D;
-
-
 }
+
 GLWidget::~GLWidget()
 {
 }
@@ -102,7 +97,7 @@ void GLWidget::setZoom(int _zoom) {
 
 void GLWidget::initializeGL()
 {
-    qglClearColor(qtBlack);
+    qglClearColor(QColor("black"));
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     glEnable(GL_BLEND);

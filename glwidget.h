@@ -65,10 +65,6 @@ private:
     float C;
     float D;
     QPoint lastPos;
-    QColor qtGreen;
-    QColor qtPurple;
-    QColor qtWhite;
-    QColor qtBlack;
     QSharedPointer<PointBuffer> pointBuffer;
 };
 
