@@ -129,10 +129,7 @@ void GLWidget::paintGL()
     glRotated(yRot / 16.0, 0.0, 1.0, 0.0);
     glRotated(zRot / 16.0, 0.0, 0.0, 1.0);
 
-
-    gluLookAt(zoom, 0., zoom,    // eye x,y,z
-              0., 0., 0.,       // center x,y,z
-              0., 2., 0.);      // Up direction
+    glScaled(10, 10, 10);
 
     glPointSize(1.0f);
 
