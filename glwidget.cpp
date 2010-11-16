@@ -87,9 +87,7 @@ void GLWidget::setZRotation(int angle)
 }
 
 void GLWidget::setZoom(int _zoom) {
-    zoom = _zoom;
-    zoom = qMax(zoom, 0.0f);
-    zoom = qMin(zoom, MAX_ZOOM);
+    zoom = qBound(0.0f, (float)_zoom, MAX_ZOOM);
 
     emit zoomChanged(zoom);
     updateGL();
@@ -173,15 +171,31 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    int dx = event->x() - lastPos.x();
-    int dy = event->y() - lastPos.y();
+    if (event->modifiers() & Qt::ControlModifier) {
+        // change attractor parameters
+        float horizPos = ((float)event->x() / width()) * 8.0f - 4.0f;
+        float vertPos = ((float)event->y() / height()) * 8.0f - 4.0f;
 
-    if (event->buttons() & Qt::LeftButton) {
-        setXRotation(xRot + 8 * dy);
-        setYRotation(yRot + 8 * dx);
-    } else if (event->buttons() & Qt::RightButton) {
-        setXRotation(xRot + 8 * dy);
-        setZRotation(zRot + 8 * dx);
+        if (event->buttons() & Qt::LeftButton) {
+            setA(horizPos);
+            setB(vertPos);
+        }
+        if (event->buttons() & Qt::RightButton) {
+            setC(horizPos);
+            setD(vertPos);
+        }
+    } else {
+        // rotate attractor
+        int dx = event->x() - lastPos.x();
+        int dy = event->y() - lastPos.y();
+
+        if (event->buttons() & Qt::LeftButton) {
+            setXRotation(xRot + 8 * dy);
+            setYRotation(yRot + 8 * dx);
+        } else if (event->buttons() & Qt::RightButton) {
+            setXRotation(xRot + 8 * dy);
+            setZRotation(zRot + 8 * dx);
+        }
     }
     lastPos = event->pos();
 }
@@ -215,19 +229,19 @@ void GLWidget::fillPointBuffer()
 }
 
 void GLWidget::setA(double value) {
-    A = value;
+    A = qBound(-4.0, value, 4.0);
     redrawPoints();
 }
 void GLWidget::setB(double value) {
-    B = value;
+    B = qBound(-4.0, value, 4.0);
     redrawPoints();
 }
 void GLWidget::setC(double value) {
-    C = value;
+    C = qBound(-4.0, value, 4.0);
     redrawPoints();
 }
 void GLWidget::setD(double value) {
-    D = value;
+    D = qBound(-4.0, value, 4.0);
     redrawPoints();
 }
 
@@ -237,7 +251,6 @@ void GLWidget::redrawPoints() {
         pointBuffer->clear();
         if (pointBuffer->size() == 0) {
             fillPointBuffer();
-
         }
         pointBuffer->render();
     }
