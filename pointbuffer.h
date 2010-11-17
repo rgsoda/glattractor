@@ -14,6 +14,8 @@ protected:
     bool bufferData(GLenum target, GLsizeiptrARB size,
                     const GLvoid *data, GLenum usage);
     bool deleteBuffers(GLsizei n, const GLuint *buffers);
+    bool pointParameterF(GLenum pname, GLfloat param);
+    bool pointParameterFV(GLenum pname, GLfloat *param);
 
     private:
     typedef void (*GenBuffersPtr)(GLsizei n, GLuint *buffers);
@@ -21,6 +23,9 @@ protected:
     typedef void (*BufferDataPtr)(GLenum target, GLsizeiptrARB size,
                                   const GLvoid *data, GLenum usage);
     typedef void (*DeleteBuffersPtr)(GLsizei n, const GLuint *buffers);
+    typedef void (*PointParameterFPtr)(GLenum pname, GLfloat param);
+    typedef void (*PointParameterFVPtr)(GLenum pname,
+                                        const GLfloat *params);
 
     static void initBufferExtension(const QGLContext *context);
     template <typename ExtensionProto>
@@ -29,10 +34,12 @@ protected:
                                  ExtensionProto *extensionPtr);
 
     static bool s_vboInitialized;
-    static GenBuffersPtr    s_glGenBuffers;
-    static BindBuffersPtr   s_glBindBuffer;
-    static BufferDataPtr    s_glBufferData;
-    static DeleteBuffersPtr s_glDeleteBuffers;
+    static GenBuffersPtr        s_glGenBuffers;
+    static BindBuffersPtr       s_glBindBuffer;
+    static BufferDataPtr        s_glBufferData;
+    static DeleteBuffersPtr     s_glDeleteBuffers;
+    static PointParameterFPtr   s_glPointParameterf;
+    static PointParameterFVPtr  s_glPointParameterfv;
 };
 
 struct Point
@@ -66,6 +73,7 @@ private:
     QVector<Point> m_pointList;
     GLuint m_glBuffer;
     bool m_dirty;
+    GLuint m_cloudTexture;
 };
 
 #endif // POINTBUFFER_H

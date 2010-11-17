@@ -208,6 +208,7 @@ void GLWidget::wheelEvent(QWheelEvent *event)
 void GLWidget::fillPointBuffer()
 {
     Point newPoint, prevPoint;
+    QColor staticColor = QColor::fromRgbF(1.0, 1.0, 1.0, 0.01);
     QColor slowColor = QColor::fromRgbF(0.0, 0.0, 1.0, 0.4);
     QColor fastColor = QColor::fromRgbF(1.0, 0.0, 0.0, 0.4);
 
@@ -219,7 +220,8 @@ void GLWidget::fillPointBuffer()
         newPoint.x = sin(A * prevPoint.y) - prevPoint.z * cos(B * prevPoint.x);
         newPoint.y = prevPoint.z * sin(C * prevPoint.x) - cos(D * prevPoint.y);
 
-        positionColor(newPoint);
+        constColor(newPoint, staticColor);
+        //positionColor(newPoint);
         //speedColor(newPoint, prevPoint, slowColor, fastColor);
         //angleColor(newPoint, prevPoint, slowColor, fastColor);
         pointBuffer->addPoint(newPoint);
@@ -255,6 +257,14 @@ void GLWidget::redrawPoints() {
         pointBuffer->render();
     }
     updateGL();
+}
+
+void GLWidget::constColor(Point &newPoint, const QColor &staticColor) const
+{
+    newPoint.r = staticColor.redF();
+    newPoint.g = staticColor.greenF();
+    newPoint.b = staticColor.blueF();
+    newPoint.a = staticColor.alphaF();
 }
 
 void GLWidget::positionColor(Point &newPoint) const
